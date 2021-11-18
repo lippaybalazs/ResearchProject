@@ -60,4 +60,4 @@ while True:
     r = y[max_ind]
     if (len(r) > 0):
         # print frequency
-        print(np.abs(x[np.where(y == r[0])[0][0]]))
+        print(np.abs(np.where(y == r[0])[0][0] / CHUNK * RATE))
