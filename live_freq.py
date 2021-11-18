@@ -28,7 +28,7 @@ x = np.fft.fftfreq(CHUNK, d = 1.0 / RATE)
 # set up first set of data
 data = stream.read(CHUNK)
 data = np.frombuffer(data, np.float32)
-y = np.abs(np.fft.fft(data))/ (RATE / CHUNK)
+y = np.abs(np.fft.fft(data)) / (RATE / CHUNK)
 
 # noise gate
 y[y < 2.5] = 0
@@ -46,7 +46,7 @@ while True:
     data = np.frombuffer(data, np.float32)
 
     # process data
-    y = np.abs(np.fft.fft(data))/ (RATE / CHUNK)
+    y = np.abs(np.fft.fft(data)) / (RATE / CHUNK)
     # noise gate
     y[y < 2.5] = 0
 
