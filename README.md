@@ -37,11 +37,30 @@ H = abs(peaks(noise_gate(X, abs(fft(T)))) / CHUNK * RATE)
 1. Baritone Ukulele (4 strings)
 2. Generated Frequency (single frequency)
 
-### Observations
+### Validation
 
-Due to instruments resonating single notes in higher octaves as well, we will consider only the lowest identified frequency
+Frequency table (example: https://pages.mtu.edu/~suits/notefreqs.html)
 
 ### Results
 
-<a href="/Experiment_1.xlsx">Experiment_1.xlsx</a>
-Individual notes are identified with a +-6 Hz accuracy error
+Experiment_1.xlsx
+
+Individual notes are identified with a +-6 Hz accuracy error.
+
+The +-6 error is insignificant in higher pitch contexts, but may lead to incorrect identification on the lower end.
+This is due to the distance between notes decreasing as they approach 0 (8 times every octave),
+and the usual home microphone not being able to pick up bass notes.
+
+### Code
+
+live_freq.py
+
+### Observations
+
+Due to instruments resonating single notes in higher octaves as well, we will consider 
+only the lowest identified frequency when searching for single notes.
+
+Reducing the values after the FFT leads to better nose cancellation
+(in general / RATE * CHUNK does the trick instead of a constant).
+
+Noise is magnitudes stronger in the lower end of the frequency spectrum.
