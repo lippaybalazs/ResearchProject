@@ -1,6 +1,7 @@
 import numpy as np
 import pyaudio
 import matplotlib.pyplot as plt
+from scipy.signal import argrelextrema
 
 FORMAT = pyaudio.paFloat32
 CHANNELS = 1
@@ -24,6 +25,7 @@ data = np.frombuffer(data, np.float32)
 
 x = np.fft.fftfreq(CHUNK, d = 1.0 / RATE)
 y = np.abs(np.fft.fft(data))/ (RATE / CHUNK)
+y[y < 2.5] = 0
 
 
 plt.ion()
@@ -32,29 +34,18 @@ line, = ax.plot(x, y)
 ax.set_xlim(0,2000)
 ax.set_ylim(0,20)
 
-last5 = [0, 0, 0, 0, 0]
-def most_frequent(List):
-    counter = 0
-    num = List[0]
-     
-    for i in List:
-        curr_frequency = List.count(i)
-        if(curr_frequency> counter):
-            counter = curr_frequency
-            num = i
- 
-    return num
-
 while True:
     data = stream.read(CHUNK)
     data = np.frombuffer(data, np.float32)
 
     y = np.abs(np.fft.fft(data))/ (RATE / CHUNK)
-    
-    last5 = last5[1:]
-    last5.append(np.abs(x[np.argmax(y)]))
-    print("guess: " + str(most_frequent(last5)))
-    
+    y[y < 2.5] = 0
+
     line.set_ydata(y)
     fig.canvas.draw()
     fig.canvas.flush_events()
+
+    max_ind = argrelextrema(y, np.greater)
+    r = y[max_ind]
+    if (len(r) > 0):
+        print(np.abs(x[np.where(y == r[0])[0][0]]))
