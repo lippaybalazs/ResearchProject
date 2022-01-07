@@ -1,7 +1,7 @@
 import numpy as np
 import pyaudio
 import matplotlib.pyplot as plt
-from scipy.signal import argrelextrema
+from scipy import signal
 
 FORMAT = pyaudio.paFloat32
 CHANNELS = 1
@@ -10,6 +10,7 @@ CHUNK = 1024 * 4
 
 pa = pyaudio.PyAudio()
 
+# set up audio device
 stream = pa.open(
     format = FORMAT,
     channels = CHANNELS,
@@ -30,9 +31,6 @@ data = stream.read(CHUNK)
 data = np.frombuffer(data, np.float32)
 y = np.abs(np.fft.fft(data)) / (RATE / CHUNK)
 
-# noise gate
-y[y < 2.5] = 0
-
 # create plot window
 plt.ion()
 fig, ax = plt.subplots()
@@ -45,10 +43,8 @@ while True:
     data = stream.read(CHUNK)
     data = np.frombuffer(data, np.float32)
 
-    # process data
+    # reduce data
     y = np.abs(np.fft.fft(data)) / (RATE / CHUNK)
-    # noise gate
-    y[y < 2.5] = 0
 
     # plot data
     line.set_ydata(y)
@@ -56,8 +52,25 @@ while True:
     fig.canvas.flush_events()
 
     # get peaks of array
-    max_ind = argrelextrema(y, np.greater)
+    max_ind,_ = signal.find_peaks(y, prominence=1)
+
+    # separate peak values
     r = y[max_ind]
+    r = np.unique(r)
     if (len(r) > 0):
-        # print frequency
-        print(np.abs(np.where(y == r[0])[0][0] / CHUNK * RATE))
+        
+        # gather frequency values
+        freq = []
+        for val in r:
+            freq.append(np.abs(np.where(y == val)[0][0] / CHUNK * RATE))
+        
+        # due to the frequency range looping around, we might get duplicates
+        freq = np.unique(freq)
+
+        
+        # false positives occur at extreme frequencies due to low data dencity
+        # music peaks at around 8kHz, thus 10kHz is a good filter
+        freq = freq[freq < 10000]
+
+        # print frequencies
+        print(freq)
