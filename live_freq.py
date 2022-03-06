@@ -1,6 +1,5 @@
 import numpy as np
 import pyaudio
-import matplotlib.pyplot as plt
 from scipy import signal
 
 FORMAT = pyaudio.paFloat32
@@ -25,19 +24,6 @@ stream = pa.open(
 # set up frequency array
 x = np.fft.fftfreq(CHUNK, d = 1.0 / RATE)
 
-
-# set up first set of data
-data = stream.read(CHUNK)
-data = np.frombuffer(data, np.float32)
-y = np.abs(np.fft.fft(data)) / (RATE / CHUNK)
-
-# create plot window
-plt.ion()
-fig, ax = plt.subplots()
-line, = ax.plot(x, y)
-ax.set_xlim(0,2000)
-ax.set_ylim(0,20)
-
 while True:
     # read chunk of data
     data = stream.read(CHUNK)
@@ -45,11 +31,6 @@ while True:
 
     # reduce data
     y = np.abs(np.fft.fft(data)) / (RATE / CHUNK)
-
-    # plot data
-    line.set_ydata(y)
-    fig.canvas.draw()
-    fig.canvas.flush_events()
 
     # get peaks of array
     max_ind,_ = signal.find_peaks(y, prominence=1)
@@ -68,8 +49,8 @@ while True:
         freq = np.unique(freq)
 
         
-        # false positives occur at extreme frequencies due to low data dencity
-        # music peaks at around 8kHz, thus 10kHz is a good filter
+        # false positives occur at extreme frequencies due to low data density
+        # human hearing stops at around 8kHz, thus 10kHz is a good filter
         freq = freq[freq < 10000]
 
         # print frequencies
