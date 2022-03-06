@@ -2,6 +2,18 @@ import numpy as np
 import pyaudio
 from scipy import signal
 
+# read notes
+
+notes = []
+
+file = open("note-frequencies.csv",'r')
+for line in file.readlines():
+    split_line = line.split(',')
+    notes.append((split_line[0],float(split_line[1])))
+file.close()
+
+
+
 FORMAT = pyaudio.paFloat32
 CHANNELS = 1
 RATE = 44100
@@ -53,5 +65,11 @@ while True:
         # human hearing stops at around 8kHz, thus 10kHz is a good filter
         freq = freq[freq < 10000]
 
-        # print frequencies
-        print(freq)
+        converted_notes = []
+        for frequency in freq:
+            note = min(notes, key=lambda x:abs(x[1]-frequency))
+            converted_notes.append(note[0])
+        
+
+        # print notes
+        print(converted_notes)
