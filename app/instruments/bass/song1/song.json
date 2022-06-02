@@ -1,0 +1,170 @@
+{
+    "title": "song1",
+    "instrument": "bass",
+    "bpm": 50,
+    "notes": 
+    [
+        {
+            "beat": 0,
+            "length": 0.5,
+            "notes": 
+            [
+                "A3"
+            ],
+            "visuals":
+            [
+                {
+                    "rail": 2,
+                    "columns":
+                    [
+                        12
+                    ]
+                }
+            ]
+        },
+        {
+            "beat": 0.5,
+            "length": 0.5,
+            "notes": 
+            [
+                "B3"
+            ],
+            "visuals":
+            [
+                {
+                    "rail": 2,
+                    "columns":
+                    [
+                        14
+                    ]
+                }
+            ]
+        },
+        {
+            "beat": 1,
+            "length": 0.5,
+            "notes": 
+            [
+                "C4"
+            ],
+            "visuals":
+            [
+                {
+                    "rail": 2,
+                    "columns":
+                    [
+                        15
+                    ]
+                }
+            ]
+        },
+        {
+            "beat": 1.5,
+            "length": 0.5,
+            "notes": 
+            [
+                "D4"
+            ],
+            "visuals":
+            [
+                {
+                    "rail": 3,
+                    "columns":
+                    [
+                        12
+                    ]
+                }
+            ]
+        },
+        {
+            "beat": 2,
+            "length": 1,
+            "notes": 
+            [
+                "E4"
+            ],
+            "visuals":
+            [
+                {
+                    "rail": 3,
+                    "columns":
+                    [
+                        14
+                    ]
+                }
+            ]
+        },
+        {
+            "beat": 3,
+            "length": 0.5,
+            "notes": 
+            [
+                "A4"
+            ],
+            "visuals":
+            [
+                {
+                    "rail": 4,
+                    "columns":
+                    [
+                        14
+                    ]
+                }
+            ]
+        },
+        {
+            "beat": 3.5,
+            "length": 0.5,
+            "notes": 
+            [
+                "G4"
+            ],
+            "visuals":
+            [
+                {
+                    "rail": 4,
+                    "columns":
+                    [
+                        12
+                    ]
+                }
+            ]
+        },
+        {
+            "beat": 4,
+            "length": 1,
+            "notes": 
+            [
+                "E4"
+            ],
+            "visuals":
+            [
+                {
+                    "rail": 3,
+                    "columns":
+                    [
+                        14
+                    ]
+                }
+            ]
+        },
+        {
+            "beat": 5,
+            "length": 1,
+            "notes": 
+            [
+                "A3"
+            ],
+            "visuals":
+            [
+                {
+                    "rail": 2,
+                    "columns":
+                    [
+                        12
+                    ]
+                }
+            ]
+        }
+    ]
+}

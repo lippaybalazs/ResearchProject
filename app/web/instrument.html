@@ -1,0 +1,60 @@
+<html>
+    <head>
+        <script type="text/javascript" src="/eel.js"></script>
+        <link rel="stylesheet" href="global.css">
+        <style>
+            
+        </style>
+        <script>
+            var songs_table;
+            
+            var instrument_name;
+
+            function OnLoad () {
+                songs_table = document.getElementById("songs_table");
+
+                const urlParams = new URLSearchParams(window.location.search);
+                instrument_name = urlParams.get("name");
+
+                Main();
+            }
+
+            function Main () {
+                 LoadSongs();
+            }
+
+            function LoadSongs () {
+                eel.get_songs(instrument_name) (songs => {
+                    var html = "";
+                    console.log(songs)
+                    songs.forEach(object => {
+                        html += "<tr>";
+                        html += "<td>" + object.title + "</td>";
+                        html += "<td>" + "<button onclick=\"SelectSong('" + object.title + "')\">></button>" + "</td>";
+                        html += "<td>" + "<button onclick=\"SelectBlockerSong('" + object.title + "')\">></button>" + "</td>"; 
+                        html += "</tr>";
+                    });
+                    songs_table.innerHTML = html;
+                });
+            }
+
+            function Back () {
+                window.location = "index.html";
+            }
+
+            function SelectSong (title) {
+                window.location = "song.html?instrument=" + instrument_name + "&song=" + title;
+            }
+
+            function SelectBlockerSong (title) {
+                window.location = "blocker_song.html?instrument=" + instrument_name + "&song=" + title;
+            }
+
+        </script>
+
+    </head>
+    <body onload="OnLoad()">
+        <button onclick="Back()">Back</button>
+        <table id="songs_table"></table>
+    </body>
+</html>

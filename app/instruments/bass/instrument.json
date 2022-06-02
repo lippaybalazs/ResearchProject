@@ -1,0 +1,56 @@
+{
+    "name": "bass",
+    "rails": 
+    [
+        {
+            "id": 1,
+            "column_count": 25,
+            "column_width": 10,
+            "column_spacing": 10,
+            "x": 0,
+            "y": 0,
+            "color": "#FF0000",
+            "draw": false
+        },
+        {
+            "id": 2,
+            "column_count": 25,
+            "column_width": 10,
+            "column_spacing": 10,
+            "x": 0,
+            "y": 0,
+            "color": "#00FF00",
+            "draw": false
+        },
+        {
+            "id": 3,
+            "column_count": 25,
+            "column_width": 10,
+            "column_spacing": 10,
+            "x": 0,
+            "y": 0,
+            "color": "#0000FF",
+            "draw": false
+        },
+        {
+            "id": 4,
+            "column_count": 25,
+            "column_width": 10,
+            "column_spacing": 10,
+            "x": 0,
+            "y": 0,
+            "color": "#FFAA00",
+            "draw": false
+        },
+        {
+            "id": 5,
+            "column_count": 25,
+            "column_width": 10,
+            "column_spacing": 10,
+            "x": 0,
+            "y": 0,
+            "color": "#000000",
+            "draw": true
+        }
+    ]
+}

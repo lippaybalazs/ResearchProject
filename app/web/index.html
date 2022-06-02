@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <script type="text/javascript" src="/eel.js"></script>
+        <link rel="stylesheet" href="global.css">
+        <style>
+            
+        </style>
+        <script>
+            var instruments_table;
+
+            function OnLoad () {
+                instruments_table = document.getElementById("instruments_table");
+
+                Main();
+            }
+
+            function Main () {
+                LoadInstruments();
+                
+            }
+
+            function LoadInstruments () {
+                
+                eel.get_instruments() (instruments => {
+                    var html = "";
+                    instruments.forEach(object => {
+                        html += "<tr>";
+                        html += "<td>" + object.name + "</td>";
+                        html += "<td>" + "<button onclick=\"SelectInstrument('" + object.name + "')\">></button>" + "</td>";
+                        html += "</tr>";
+                    });
+                    instruments_table.innerHTML = html;
+                });
+            }
+
+            function SelectInstrument (name) {
+                window.location = "instrument.html?name=" + name;
+            }
+
+        </script>
+
+    </head>
+    <body onload="OnLoad()">
+        <table id="instruments_table"></table>
+    </body>
+</html>

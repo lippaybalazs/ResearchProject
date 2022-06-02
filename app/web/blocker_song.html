@@ -1,0 +1,191 @@
+<html>
+    <head>
+        <script type="text/javascript" src="/eel.js"></script>
+        <link rel="stylesheet" href="global.css">
+        <style>
+            #overlay_controls {
+                position: fixed;
+
+                z-index: 99;
+            }
+        </style>
+        <script>
+            var canvas;
+            var context;
+
+            const VERTICAL_TILES = 14;
+            
+            var instrument_name;
+            var song_name;
+
+            var instrument;
+            var song;
+            var note_queue = [];
+
+            function OnLoad () {
+                const urlParams = new URLSearchParams(window.location.search);
+                instrument_name = urlParams.get("instrument");
+                song_name = urlParams.get("song");
+
+                canvas = document.getElementById("canvas");
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                context = canvas.getContext("2d");
+
+                Main();
+            }
+
+            function Main () {
+                LoadInstrument();
+                setInterval(Act, 1000 / 30);
+            }
+
+            function LoadInstrument () {
+                
+                eel.load_instrument(instrument_name) (object => {
+                    object.rails.forEach(rail => {
+                        rail.note_queue = [];
+                    })
+                    instrument = object;
+                    //PushNotes([{"rail_id":1,"position":0,"length":2},{"rail_id":1,"position":3,"length":1}])
+                    //PushNotes([{"rail_id":2,"position":0,"length":2},{"rail_id":2,"position":3,"length":1}])
+                    
+                    //PushNotes([{"rail_id":2,"position":4,"length":1}])
+                    //PushNotes([{"rail_id":2,"position":2,"length":1},{"rail_id":2,"position":4,"length":1}])
+                    console.log("start")
+                    eel.start_blocker_song(instrument_name, song_name)();
+                });
+            }
+
+            
+            function PopNotes () {
+                instrument.rails.forEach(rail => {
+                    rail.note_queue.shift();
+                })
+            }
+
+            eel.expose(PushBlockerNotes)
+            function PushBlockerNotes (notes) {
+                instrument.rails.forEach(rail => {
+                    rail.note_queue.forEach(note => {
+                        note.forEach(visual => {
+                            visual.tile += 1;
+                        });
+                    });
+                });
+                instrument.rails.forEach(rail => {
+                    rail.note_queue.push([]);
+                })
+                notes.forEach(note => {
+                    for (i = 0; i < instrument.rails.length; i++) {
+                        if (instrument.rails[i].id == note.rail_id) {
+                            var rail = instrument.rails[i];
+                            instrument.rails[i].note_queue[instrument.rails[i].note_queue.length - 1].push({
+                                "x": rail.x + canvas.width / rail.column_count * (note.position) + rail.column_spacing / 2,
+                                "width": canvas.width / rail.column_count - rail.column_spacing, 
+                                "height": (canvas.height - 100 + rail.y) / VERTICAL_TILES * note.length,
+                                "tile": -1
+                            });
+                        
+                        }    
+                    }
+                    
+                })
+            }
+
+            function DrawFrame () {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                
+                instrument.rails.forEach(rail => {
+                    rail.note_queue.forEach(note => {
+                        note.forEach(visual => {
+                            var y = (canvas.height - 100 + rail.y) / VERTICAL_TILES * (visual.tile) - visual.height;
+                            var overlap = y + visual.height - (canvas.height - 100 + rail.y);
+                            if (overlap < 0) {
+                                overlap = 0;
+                            }
+                            if (visual.height - overlap > 0) {
+                                context.beginPath();
+                                context.rect(visual.x, y, visual.width, visual.height - overlap);
+                                context.fillStyle = rail.color;
+                                context.fill();
+                            }
+                        });
+                    });
+                });
+                
+                instrument.rails.forEach(rail => {
+                    if (rail.draw) {
+                        context.beginPath();
+                        var base_y = canvas.height - 100;
+                        context.moveTo(rail.x, base_y + rail.y);
+                        context.lineTo(canvas.width + rail.x, base_y + rail.y + 2);
+                        context.strokeStyle = rail.color;
+                        context.stroke();
+
+                        for (i = 0; i < rail.column_count + 1; i++) {
+                            context.beginPath();
+                            context.moveTo(canvas.width / rail.column_count * i + rail.x, base_y + rail.y);
+                            context.lineTo(canvas.width / rail.column_count * i + rail.x, base_y + rail.y + 10);
+                            context.strokeStyle = rail.color;
+                            context.stroke();
+                            context.textAlign = "center";
+                            context.font = "10px Arial";
+                            context.fillStyle = rail.color;
+                            context.fillText(i, canvas.width / rail.column_count * (i + 0.5) + rail.x, base_y + rail.y + 10); 
+                            
+                        }
+                    }
+                });
+
+            }
+
+            function Act () {
+                var now = (new Date()).getTime();
+
+                // move notes down
+                var count = 0;
+                instrument.rails.forEach(rail => {
+                    rail.note_queue.forEach(note => {
+                        note.forEach(visual => {
+                            //visual.tile += 0.1;
+                            count += 1;
+                        });
+                    });
+                });
+
+                // remove bottom notes if no longer visible
+                var under = true;
+                instrument.rails.forEach(rail => {
+                    if (rail.note_queue.length > 0) {
+                        rail.note_queue[0].forEach(visual => {
+                            if ((canvas.height - 100 + rail.y) / VERTICAL_TILES * (visual.tile) - visual.height < (canvas.height - 100 + rail.y)) {
+                                under = false;
+                            }
+                        });
+                    } else {
+                        under = false;
+                    }
+                });
+                if (under) {
+                    PopNotes();
+                }
+
+                DrawFrame();
+            }
+
+            function Back () {
+                window.location = "instrument.html?name=" + instrument_name;
+            }
+
+        </script>
+
+    </head>
+    <body onload="OnLoad()">
+        <div id="overlay_controls">
+            <button onclick="Back()">Back</button>
+        </div>
+        <canvas id="canvas"></canvas>
+    </body>
+</html>
