@@ -4,14 +4,26 @@
         <script type="text/javascript" src="/eel.js"></script>
         <link rel="stylesheet" href="global.css">
         <style>
-            #live_feed-table, #live_feed_notes-table {
+
+            #live_feed_left-div {
                 border: 1px solid black;
                 width: 40%;
                 margin-left: 5%;
-                margin-right: 5%;
-                margin-top: 50px;
+                margin-top: 25px;
                 display: block;
                 float: left;
+            }
+            #live_feed_right-div {
+                border: 1px solid black;
+                width: 40%;
+                margin-right: 5%;
+                margin-top: 25px;
+                display: block;
+                float: right;
+            }
+
+            #live_feed-table, #live_feed_notes-table {
+                width: 100%;
             }
             #live_feed-table tr, #live_feed_notes-table tr{
                 height: 25px;
@@ -20,11 +32,27 @@
             #live_feed-table td, #live_feed_notes-table td{
                 padding-left: 10px;
             }
+
+            #configuration-div {
+                height: calc(100% - 400px);
+                display: block;
+                float:left;
+                width: 90%;
+                margin-left: 5%;
+                margin-top: 20px;
+            }
+
+            #configuration-textarea {
+                resize: none;
+                width: 100%;
+                height: calc(100% - 25px);
+            }
         </style>
         <script>
 
-            var frequencies = [];
             var instrument_directory;
+            var configuration_textarea;
+            var error_div;
 
             var live_feed_table;
             var live_feed_notes_table;
@@ -33,6 +61,8 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 instrument_directory = urlParams.get("instrument");
 
+                error_div = document.getElementById("error-div")
+                configuration_textarea = document.getElementById("configuration-textarea")
                 live_feed_table = document.getElementById("live_feed-table")
                 live_feed_notes_table = document.getElementById("live_feed_notes-table")
                 
@@ -40,7 +70,8 @@
             }
 
             function Main () {
-                LoadFrequencies()
+                LoadFrequencies();
+                LoadCorrections();
                 setInterval(Act, 1000 / 30);
             }
 
@@ -48,9 +79,15 @@
                 eel.load_frequency_map(instrument_directory) ()
             }
 
+            function LoadCorrections() {
+                eel.get_corrections(instrument_directory) (text => {
+                    console.log(text)
+                    configuration_textarea.value = text
+                })
+            }
+
             function Act() {
                 eel.get_frequencies() (object => {
-                    console.log(object)
                     var html = "";
                     object[0].forEach(row => {
                         html += '<tr><td><div>';
@@ -72,8 +109,17 @@
                 })
             }
 
+            function SaveConfiguration() {
+                console.log("asd")
+                eel.save_corrections(instrument_directory, configuration_textarea.value) (error => {
+                    error_div.innerHTML = error;
+                })
+            }
+
             function Refresh() {
-                location.reload()
+                eel.load_frequency_map(instrument_directory) ()
+                live_feed_notes_table.innerHTML = "";
+                live_feed_table.innerHTML = "";
             }
 
             function Back () {
@@ -88,8 +134,21 @@
             <button onclick="Back()">Back</button>
             <button id="refresh-button" onclick="Refresh()">Reload</button>
         </div>
-        <table id="live_feed-table"></table>
-        <table id="live_feed_notes-table"></table>
-        
+        <div id="content">
+            <div id="live_feed_left-div">
+                <div>Frequency (Hz) stream</div>
+                <table id="live_feed-table"></table>
+            </div>
+            <div id="live_feed_right-div">
+                <div>Note stream</div>
+                <table id="live_feed_notes-table"></table>
+            </div>
+        </div>
+
+        <div id="configuration-div">
+            <div>Configuration Editor</div>
+            <textarea id="configuration-textarea" onfocusout="SaveConfiguration()"></textarea>
+            <div id="error-div"></div>
+        </div>
     </body>
 </html>

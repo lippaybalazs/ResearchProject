@@ -4,6 +4,8 @@ import json
 import time
 import frequency
 import shutil
+import webbrowser
+
 
 from typing import List, Tuple
 
@@ -369,6 +371,29 @@ def beat_tick():
         eel.spawn(beat_tick)
 
 eel.init('web')
+
+@eel.expose
+def get_corrections(instrument):
+    corrections_path = os.path.join(INSTRUMENTS_DIR, instrument, "correction.json")
+    if os.path.exists(corrections_path):
+        file = open(corrections_path,'r')
+        corrections = file.read()
+        file.close()
+        return corrections
+    else:
+        return ""
+
+@eel.expose
+def save_corrections(instrument, corrections):
+    try:
+        json.loads(corrections)
+        corrections_path = os.path.join(INSTRUMENTS_DIR, instrument, "correction.json")
+        file = open(corrections_path,'w')
+        file.write(corrections)
+        file.close()
+        return ""
+    except Exception as e:
+        return str(e)
 
 @eel.expose
 def load_frequency_map(instrument):
