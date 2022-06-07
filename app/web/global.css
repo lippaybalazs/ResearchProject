@@ -3,3 +3,8 @@ html, body {
     padding: 0 !important;
     overflow: hidden;
 }
+
+#thumbnail {
+    width: 150px;
+    height: 150px;
+}

@@ -1,12 +1,15 @@
 <html>
     <head>
+        <title>Note Rails</title>
         <script type="text/javascript" src="/eel.js"></script>
         <link rel="stylesheet" href="global.css">
         <style>
-            
+        
         </style>
         <script>
             var instruments_table;
+
+            var instruments = [];
 
             function OnLoad () {
                 instruments_table = document.getElementById("instruments_table");
@@ -21,20 +24,33 @@
 
             function LoadInstruments () {
                 
-                eel.get_instruments() (instruments => {
-                    var html = "";
-                    instruments.forEach(object => {
-                        html += "<tr>";
-                        html += "<td>" + object.name + "</td>";
-                        html += "<td>" + "<button onclick=\"SelectInstrument('" + object.name + "')\">></button>" + "</td>";
-                        html += "</tr>";
-                    });
-                    instruments_table.innerHTML = html;
+                eel.get_instruments() (object => {
+                    instruments = object;
+                    FillTableInstruments();
                 });
             }
 
-            function SelectInstrument (name) {
-                window.location = "instrument.html?name=" + name;
+            function FillTableInstruments() {
+                var html = "";
+                instruments.forEach(object => {
+                    console.log(object)
+                    html += '<tr><td><div class="table_element-div">';
+                    html += object.name;
+                    
+                    if (object.image != "") {
+                        html += '<img id="thumbnail" src="' + object.image + '">';
+                    } else {
+                        html += '<img id="thumbnail" src="images/default_instrument_icon.jpg">'; 
+                    }
+                    html += "<button onclick=\"SelectInstrument('" + object.directory + "')\">></button>";
+                    
+                    html += "</div></td></tr>";
+                });
+                instruments_table.innerHTML = html;
+            }
+
+            function SelectInstrument (directory) {
+                window.location = "instrument.html?instrument=" + directory;
             }
 
         </script>

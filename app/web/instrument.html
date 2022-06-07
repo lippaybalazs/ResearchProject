@@ -1,5 +1,6 @@
 <html>
     <head>
+        <title>Note Rails</title>
         <script type="text/javascript" src="/eel.js"></script>
         <link rel="stylesheet" href="global.css">
         <style>
@@ -8,13 +9,13 @@
         <script>
             var songs_table;
             
-            var instrument_name;
+            var instrument_directory;
 
             function OnLoad () {
                 songs_table = document.getElementById("songs_table");
 
                 const urlParams = new URLSearchParams(window.location.search);
-                instrument_name = urlParams.get("name");
+                instrument_directory = urlParams.get("instrument");
 
                 Main();
             }
@@ -24,14 +25,19 @@
             }
 
             function LoadSongs () {
-                eel.get_songs(instrument_name) (songs => {
+                eel.get_songs(instrument_directory) (songs => {
                     var html = "";
                     console.log(songs)
                     songs.forEach(object => {
                         html += "<tr>";
                         html += "<td>" + object.title + "</td>";
-                        html += "<td>" + "<button onclick=\"SelectSong('" + object.title + "')\">></button>" + "</td>";
-                        html += "<td>" + "<button onclick=\"SelectBlockerSong('" + object.title + "')\">></button>" + "</td>"; 
+                        if (object.image != "") {
+                            html += "<td>" + '<img id="thumbnail" src="' + object.image + '">' + "</td>";
+                        } else {
+                            html += "<td>" + '<img id="thumbnail" src="images/default_song_icon.jpg">' + "</td>"; 
+                        }
+                        html += "<td>" + "<button onclick=\"SelectSong('" + object.directory + "')\">></button>" + "</td>";
+                        html += "<td>" + "<button onclick=\"SelectBlockerSong('" + object.directory + "')\">></button>" + "</td>"; 
                         html += "</tr>";
                     });
                     songs_table.innerHTML = html;
@@ -42,19 +48,23 @@
                 window.location = "index.html";
             }
 
-            function SelectSong (title) {
-                window.location = "song.html?instrument=" + instrument_name + "&song=" + title;
+            function SelectSong (song_directory) {
+                window.location = "song_flow.html?instrument=" + instrument_directory + "&song=" + song_directory;
             }
 
-            function SelectBlockerSong (title) {
-                window.location = "blocker_song.html?instrument=" + instrument_name + "&song=" + title;
+            function SelectBlockerSong (song_directory) {
+                window.location = "song_block.html?instrument=" + instrument_directory + "&song=" + song_directory;
             }
 
+            function Calibrate () {
+                window.location = "calibration.html?instrument=" + instrument_directory
+            }
         </script>
 
     </head>
     <body onload="OnLoad()">
         <button onclick="Back()">Back</button>
+        <button onclick="Calibrate()">Calibrate</button>
         <table id="songs_table"></table>
     </body>
 </html>

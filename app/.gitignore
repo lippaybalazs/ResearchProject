@@ -1,0 +1,4 @@
+instruments/*
+web/temp/*
+__pycache__/*
+.vscode/*

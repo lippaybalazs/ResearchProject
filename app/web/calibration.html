@@ -1,0 +1,95 @@
+<html>
+    <head>
+        <title>Note Rails</title>
+        <script type="text/javascript" src="/eel.js"></script>
+        <link rel="stylesheet" href="global.css">
+        <style>
+            #live_feed-table, #live_feed_notes-table {
+                border: 1px solid black;
+                width: 40%;
+                margin-left: 5%;
+                margin-right: 5%;
+                margin-top: 50px;
+                display: block;
+                float: left;
+            }
+            #live_feed-table tr, #live_feed_notes-table tr{
+                height: 25px;
+                overflow: hidden;
+            }
+            #live_feed-table td, #live_feed_notes-table td{
+                padding-left: 10px;
+            }
+        </style>
+        <script>
+
+            var frequencies = [];
+            var instrument_directory;
+
+            var live_feed_table;
+            var live_feed_notes_table;
+
+            function OnLoad () {
+                const urlParams = new URLSearchParams(window.location.search);
+                instrument_directory = urlParams.get("instrument");
+
+                live_feed_table = document.getElementById("live_feed-table")
+                live_feed_notes_table = document.getElementById("live_feed_notes-table")
+                
+                Main();
+            }
+
+            function Main () {
+                LoadFrequencies()
+                setInterval(Act, 1000 / 30);
+            }
+
+            function LoadFrequencies() {
+                eel.load_frequency_map(instrument_directory) ()
+            }
+
+            function Act() {
+                eel.get_frequencies() (object => {
+                    console.log(object)
+                    var html = "";
+                    object[0].forEach(row => {
+                        html += '<tr><td><div>';
+                        row.forEach(column => {
+                            html += column + ' ';
+                        });
+                        html += '</div></td></tr>';
+                    });
+                    live_feed_notes_table.innerHTML = html;
+                    var html = "";
+                    object[1].forEach(row => {
+                        html += '<tr><td><div>';
+                        row.forEach(column => {
+                            html += column.toFixed(2) + ' ';
+                        });
+                        html += '</div></td></tr>';
+                    });
+                    live_feed_table.innerHTML = html;
+                })
+            }
+
+            function Refresh() {
+                location.reload()
+            }
+
+            function Back () {
+                window.location = "instrument.html?instrument=" + instrument_directory;
+            }
+
+        </script>
+
+    </head>
+    <body onload="OnLoad()">
+        <div id="overlay_controls">
+            <button onclick="Back()">Back</button>
+            <button id="refresh-button" onclick="Refresh()">Reload</button>
+        </div>
+        <table id="live_feed-table"></table>
+        <table id="live_feed_notes-table"></table>
+        
+    </body>
+</html>

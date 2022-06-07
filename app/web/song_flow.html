@@ -1,5 +1,6 @@
 <html>
     <head>
+        <title>Note Rails</title>
         <script type="text/javascript" src="/eel.js"></script>
         <link rel="stylesheet" href="global.css">
         <style>
@@ -12,11 +13,18 @@
         <script>
             var canvas;
             var context;
+            var score_div;
+            var combo_div;
 
-            const VERTICAL_TILES = 14;
+            var background;
             
-            var instrument_name;
-            var song_name;
+            var bpm = 0;
+            var last_time_frame;
+
+            const VERTICAL_TILES = 15;
+            
+            var instrument_directory;
+            var song_directory;
 
             var instrument;
             var song;
@@ -24,9 +32,11 @@
 
             function OnLoad () {
                 const urlParams = new URLSearchParams(window.location.search);
-                instrument_name = urlParams.get("instrument");
-                song_name = urlParams.get("song");
+                instrument_directory = urlParams.get("instrument");
+                song_directory = urlParams.get("song");
 
+                score_div = document.getElementById("score-div");
+                combo_div = document.getElementById("combo-div");
                 canvas = document.getElementById("canvas");
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
@@ -43,18 +53,27 @@
 
             function LoadInstrument () {
                 
-                eel.load_instrument(instrument_name) (object => {
+                eel.hard_load_instrument(instrument_directory) (object => {
+                    console.log(object)
                     object.rails.forEach(rail => {
                         rail.note_queue = [];
+                        if (rail.image != "") {
+                            var image = new Image();
+                            image.src = rail.image;
+                            rail.image = image;
+                        }
                     })
                     instrument = object;
-                    //PushNotes([{"rail_id":1,"position":0,"length":2},{"rail_id":1,"position":3,"length":1}])
-                    //PushNotes([{"rail_id":2,"position":0,"length":2},{"rail_id":2,"position":3,"length":1}])
-                    
-                    //PushNotes([{"rail_id":2,"position":4,"length":1}])
-                    //PushNotes([{"rail_id":2,"position":2,"length":1},{"rail_id":2,"position":4,"length":1}])
-                    console.log("start")
-                    eel.start_blocker_song(instrument_name, song_name)();
+                    eel.start_song(instrument_directory, song_directory)(song => {
+                        if (song.background != "" && song.background[0] != "#") {
+                            var image = new Image();
+                                image.src = song.background;
+                                background = image;
+                        } else {
+                            background = song.background;
+                        }
+                        bpm = song.bpm;
+                    });
                 });
             }
 
@@ -65,12 +84,18 @@
                 })
             }
 
-            eel.expose(PushBlockerNotes)
-            function PushBlockerNotes (notes) {
+            eel.expose(UpdateScore)
+            function UpdateScore(score, combo) {
+                score_div.innerHTML = score;
+                combo_div.innerHTML = combo;
+            }
+
+            eel.expose(PushNotes)
+            function PushNotes (notes) {
                 instrument.rails.forEach(rail => {
                     rail.note_queue.forEach(note => {
                         note.forEach(visual => {
-                            visual.tile += 1;
+                            //visual.tile += 1;
                         });
                     });
                 });
@@ -95,8 +120,21 @@
             }
 
             function DrawFrame () {
+            
                 context.clearRect(0, 0, canvas.width, canvas.height);
                 
+                if (background[0] == "#" && background.length == 7) {
+                    context.beginPath();
+                    context.rect(0, 0, canvas.width, canvas.height);
+                    context.fillStyle = background;
+                    context.fill();
+                } else {
+                    if (background != "") {
+                        context.drawImage(background, 0, 0, canvas.width, canvas.height);
+                    }
+                    
+                }
+
                 instrument.rails.forEach(rail => {
                     rail.note_queue.forEach(note => {
                         note.forEach(visual => {
@@ -116,6 +154,9 @@
                 });
                 
                 instrument.rails.forEach(rail => {
+                    if (rail.image != "") {
+                        context.drawImage(rail.image, rail.x, canvas.height - 100 + rail.y, canvas.width, 100 - rail.y)
+                    }
                     if (rail.draw) {
                         context.beginPath();
                         var base_y = canvas.height - 100;
@@ -134,7 +175,6 @@
                             context.font = "10px Arial";
                             context.fillStyle = rail.color;
                             context.fillText(i, canvas.width / rail.column_count * (i + 0.5) + rail.x, base_y + rail.y + 10); 
-                            
                         }
                     }
                 });
@@ -142,18 +182,20 @@
             }
 
             function Act () {
-                var now = (new Date()).getTime();
-
-                // move notes down
-                var count = 0;
-                instrument.rails.forEach(rail => {
-                    rail.note_queue.forEach(note => {
-                        note.forEach(visual => {
-                            //visual.tile += 0.1;
-                            count += 1;
+                
+                var now = (new Date()).getTime() / 1000;
+                if (last_time_frame != undefined) {
+                    instrument.rails.forEach(rail => {
+                        rail.note_queue.forEach(note => {
+                            note.forEach(visual => {
+                                visual.tile += (now - last_time_frame) * bpm / 60 * 4;
+                            });
                         });
                     });
-                });
+                }
+                last_time_frame = now;
+
+
 
                 // remove bottom notes if no longer visible
                 var under = true;
@@ -176,7 +218,8 @@
             }
 
             function Back () {
-                window.location = "instrument.html?name=" + instrument_name;
+                eel.stop_song()();
+                window.location = "instrument.html?instrument=" + instrument_directory;
             }
 
         </script>
@@ -185,6 +228,8 @@
     <body onload="OnLoad()">
         <div id="overlay_controls">
             <button onclick="Back()">Back</button>
+            <div id="score-div">0</div>
+            <div id="combo-div">0</div>
         </div>
         <canvas id="canvas"></canvas>
     </body>
