@@ -4,14 +4,17 @@ import json
 import time
 import frequency
 import shutil
-import webbrowser
-
-
 from typing import List, Tuple
 
 OS = "windows" if os.name == "nt" else "unix"
 
-INSTRUMENTS_DIR = os.path.abspath("instruments")
+if OS == "windows":
+    INSTRUMENTS_DIR = os.path.join(os.getenv('APPDATA'), "note_rails", "instruments")
+if OS == "unix":
+    INSTRUMENTS_DIR = os.path.join(os.path.expanduser('~'), ".note_rails", "instruments")
+
+if not os.path.exists(INSTRUMENTS_DIR):
+    os.makedirs(INSTRUMENTS_DIR)
 
 LOOKAHEAD_BEATS = 4
 
@@ -386,7 +389,8 @@ def get_corrections(instrument):
 @eel.expose
 def save_corrections(instrument, corrections):
     try:
-        json.loads(corrections)
+        if corrections != "":
+            json.loads(corrections)
         corrections_path = os.path.join(INSTRUMENTS_DIR, instrument, "correction.json")
         file = open(corrections_path,'w')
         file.write(corrections)

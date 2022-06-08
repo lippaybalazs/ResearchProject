@@ -2,3 +2,6 @@ instruments/*
 web/temp/*
 __pycache__/*
 .vscode/*
+*.spec
+dist/*
+build/*

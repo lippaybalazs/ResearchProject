@@ -6,20 +6,22 @@
         <style>
 
             #live_feed_left-div {
-                border: 1px solid black;
+                border: 2px solid black;
                 width: 40%;
                 margin-left: 5%;
-                margin-top: 25px;
+                margin-top: 70px;
                 display: block;
                 float: left;
+                border-radius: 5px;
             }
             #live_feed_right-div {
-                border: 1px solid black;
+                border: 2px solid black;
                 width: 40%;
                 margin-right: 5%;
-                margin-top: 25px;
+                margin-top: 70px;
                 display: block;
                 float: right;
+                border-radius: 5px;
             }
 
             #live_feed-table, #live_feed_notes-table {
@@ -44,8 +46,36 @@
 
             #configuration-textarea {
                 resize: none;
+                border: 2px solid black;
                 width: 100%;
                 height: calc(100% - 25px);
+            }
+
+            #back-button {
+                width: 120px;
+                height: 40px;
+                border-radius: 10px;
+                font-size: 18px;
+                position: fixed;
+                display: block;
+                top: 10px;
+                left: 10px;
+            }
+
+            #refresh-button {
+                width: 120px;
+                height: 40px;
+                border-radius: 10px;
+                font-size: 18px;
+                position: fixed;
+                display: block;
+                top: 10px;
+                right: 10px;
+            }
+
+            .label-div {
+                width: 100%;
+                text-align: center;
             }
         </style>
         <script>
@@ -81,7 +111,9 @@
 
             function LoadCorrections() {
                 eel.get_corrections(instrument_directory) (text => {
-                    console.log(text)
+                    if (text == "") {
+                        text = '{\n    "Example": 0.0,\n    "A#24": 0.0\n}';
+                    }
                     configuration_textarea.value = text
                 })
             }
@@ -110,7 +142,10 @@
             }
 
             function SaveConfiguration() {
-                console.log("asd")
+                var text = configuration_textarea.value 
+                if (text == '{\n    "Example": 0.0,\n    "A#24": 0.0\n}') {
+                    text = "";
+                }
                 eel.save_corrections(instrument_directory, configuration_textarea.value) (error => {
                     error_div.innerHTML = error;
                 })
@@ -131,16 +166,16 @@
     </head>
     <body onload="OnLoad()">
         <div id="overlay_controls">
-            <button onclick="Back()">Back</button>
+            <button id="back-button" onclick="Back()">Back</button>
             <button id="refresh-button" onclick="Refresh()">Reload</button>
         </div>
         <div id="content">
             <div id="live_feed_left-div">
-                <div>Frequency (Hz) stream</div>
+                <div class="label-div">Frequency (Hz) stream</div>
                 <table id="live_feed-table"></table>
             </div>
             <div id="live_feed_right-div">
-                <div>Note stream</div>
+                <div class="label-div">Note stream</div>
                 <table id="live_feed_notes-table"></table>
             </div>
         </div>

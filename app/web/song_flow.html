@@ -9,6 +9,53 @@
 
                 z-index: 99;
             }
+
+            #back-button {
+                width: 120px;
+                height: 40px;
+                border-radius: 10px;
+                font-size: 18px;
+                position: fixed;
+                display: block;
+                top: 10px;
+                left: 10px;
+            }
+
+            #wrapper-score-div {
+                border: 2px solid black;
+                background-color: white;
+                width: 150px;
+                height: 32px;
+                padding-top: 8px;
+                padding-left: 10px;
+                border-radius: 10px;
+                font-size: 20px;
+                position: fixed;
+                display: block;
+                top: 8px;
+                left: 310px;
+            }
+
+            #score-div, #combo-div{
+                display: block;
+                float: right;
+                margin-right: 10px;
+            }
+
+            #wrapper-combo-div {
+                border: 2px solid black;
+                background-color: white;
+                width: 150px;
+                height: 32px;
+                padding-left: 10px;
+                padding-top: 8px;
+                border-radius: 10px;
+                font-size: 20px;
+                position: fixed;
+                display: block;
+                top: 8px;
+                left: 140px;
+            }
         </style>
         <script>
             var canvas;
@@ -227,9 +274,9 @@
     </head>
     <body onload="OnLoad()">
         <div id="overlay_controls">
-            <button onclick="Back()">Back</button>
-            <div id="score-div">0</div>
-            <div id="combo-div">0</div>
+            <button id="back-button" onclick="Back()">Back</button>
+            <div id="wrapper-score-div">Score:<div id="score-div">0</div></div>
+            <div id="wrapper-combo-div">Combo:<div id="combo-div">0</div></div>
         </div>
         <canvas id="canvas"></canvas>
     </body>

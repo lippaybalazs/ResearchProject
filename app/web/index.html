@@ -4,15 +4,71 @@
         <script type="text/javascript" src="/eel.js"></script>
         <link rel="stylesheet" href="global.css">
         <style>
-        
+            .table_element-div {
+                height: 155px;
+                width: 500px;
+                padding: 5px;
+                border: 2px solid black;
+                border-radius: 5px;
+                position: relative;
+            }
+
+            .select-button {
+                width: 70px;
+                height: 40px;
+                border-radius: 10px;
+                font-size: 18px;
+                position: absolute;
+                display: block;
+                bottom: 10px;
+                right: 10px;
+            }
+
+            #instruments_table {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            #thumbnail {
+                
+                border: 2px solid black;
+                border-radius: 10px;
+                display: block;
+                float: left;
+            }
+
+            .name-div {
+                display: block;
+                float: left;
+                font-size: 40px;
+                margin-left: 20px;
+                max-width: 300px;
+                overflow: hidden;
+            }
+
+            #search {
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+                width: 515px;
+                border-radius: 5px;
+                height: 40px;
+                padding-left: 10px;
+                margin-top: 50px;
+            }
         </style>
         <script>
             var instruments_table;
+            var search;
 
             var instruments = [];
 
             function OnLoad () {
                 instruments_table = document.getElementById("instruments_table");
+                search = document.getElementById("search");
+
+                search.addEventListener('input', FillTableInstruments);
+                search.addEventListener('propertychange', FillTableInstruments);
 
                 Main();
             }
@@ -33,18 +89,21 @@
             function FillTableInstruments() {
                 var html = "";
                 instruments.forEach(object => {
-                    console.log(object)
-                    html += '<tr><td><div class="table_element-div">';
-                    html += object.name;
                     
-                    if (object.image != "") {
-                        html += '<img id="thumbnail" src="' + object.image + '">';
-                    } else {
-                        html += '<img id="thumbnail" src="images/default_instrument_icon.jpg">'; 
+                    if (object.name.toUpperCase().match(search.value.toUpperCase().trim())) {
+                        html += '<tr><td><div class="table_element-div">';    
+                        if (object.image != "") {
+                            html += '<img id="thumbnail" src="' + object.image + '">';
+                        } else {
+                            html += '<img id="thumbnail" src="images/default_instrument_icon.jpg">'; 
+                        }
+                        html += '<div class="name-div">' + object.name + "</div>";
+                        html += "<button class='select-button' onclick=\"SelectInstrument('" + object.directory + "')\">Select</button>";
+                        
+                        html += "</div></td></tr>";
                     }
-                    html += "<button onclick=\"SelectInstrument('" + object.directory + "')\">></button>";
+
                     
-                    html += "</div></td></tr>";
                 });
                 instruments_table.innerHTML = html;
             }
@@ -57,6 +116,7 @@
 
     </head>
     <body onload="OnLoad()">
+        <input id="search" placeholder="Search">
         <table id="instruments_table"></table>
     </body>
 </html>

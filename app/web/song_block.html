@@ -9,6 +9,17 @@
 
                 z-index: 99;
             }
+
+            #back-button {
+                width: 120px;
+                height: 40px;
+                border-radius: 10px;
+                font-size: 18px;
+                position: fixed;
+                display: block;
+                top: 10px;
+                left: 10px;
+            }
         </style>
         <script>
             var canvas;
@@ -219,7 +230,7 @@
     </head>
     <body onload="OnLoad()">
         <div id="overlay_controls">
-            <button onclick="Back()">Back</button>
+            <button id="back-button" onclick="Back()">Back</button>
         </div>
         <canvas id="canvas"></canvas>
     </body>
